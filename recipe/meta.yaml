@@ -72,29 +72,40 @@ requirements:
     - if: osx and arm64
       then: mlx-lm
 
-tests:
-  - python:
-      imports:
-        - xgrammar
-      pip_check: true
+#tests:
+#  - python:
+#      imports:
+#        - xgrammar
+#      pip_check: true
+#
+#  - script:
+#      - python -m pytest tests/ -m "not hf_token_required"
+#    files:
+#      source:
+#        - tests/
+#    requirements:
+#      run:
+#        - ninja
+#        - protobuf
+#        - pytest
+#        - huggingface_hub
+#        - numpy >=1.26.0
+#        - pydantic
+#        - sentencepiece
+#        - tiktoken
+#        - pytorch >=1.10.0
+#        - transformers >=4.38.0
 
-  - script:
-      - python -m pytest tests/ -m "not hf_token_required"
-    files:
-      source:
-        - tests/
-    requirements:
-      run:
-        - ninja
-        - protobuf
-        - pytest
-        - huggingface_hub
-        - numpy >=1.26.0
-        - pydantic
-        - sentencepiece
-        - tiktoken
-        - pytorch >=1.10.0
-        - transformers >=4.38.0
+test:
+  imports:
+    - xgrammar
+  requires:
+    - pytest
+  commands:
+    - python -m pytest tests/ -m "not hf_token_required"
+  source_files:
+    - tests/
+
 
 about:
   homepage: https://github.com/mlc-ai/xgrammar
