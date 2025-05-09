@@ -38,7 +38,7 @@ requirements:
         - nanobind
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
-    - ${{ stdlib("c") }}
+    #- ${{ stdlib("c") }}
     - cmake
     - ninja
     - if: unix
@@ -98,6 +98,11 @@ about:
     - NOTICE
 
 extra:
+  anaconda-services:
+    ref: https://anaconda.zendesk.com/agent/tickets/49522
+    reason: Dependency for vllm
+  recipe-maintainers:
+    - ianaobi
   recipe-maintainers:
     - zbowling
     - Ubospica
