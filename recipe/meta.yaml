@@ -1,64 +1,65 @@
-{% set name = "xgrammar" %}
-{% set version = "0.1.18" %}
-
 package:
-  name: {{ name|lower }}
-  version: {{ version }}
+  name: xgrammar
+  version: 0.1.16
 
 source:
-  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/xgrammar-{{ version }}.tar.gz
-  sha256: a0438a0f9262fff1d0e4f184268eb759f094243edce92b67eb7aa5f245c47471
-  patches:
-    - patches/001_remove_ninja_dep.patch
+  url: https://pypi.org/packages/source/x/xgrammar/xgrammar-0.1.16.tar.gz
+  sha256: 4ddd5128a82d0a9c800c03df25c610368ca630704ad20a6bb7a3629f24ced442
 
 build:
-  number: 2
-  script:
-    - export CMAKE_BUILD_TYPE=Release
-    - export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
-    - export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
-    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  number: 0
+  script: |
+    export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
+    if [[ $(uname) == "Linux" ]]; then
+      export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
+    fi
+    $PYTHON -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   build:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
+    - {{ stdlib("c") }}
     - cmake
     - ninja
-    - make
-    - git
+    - make  # [linux]
   host:
     - python
     - scikit-build-core >=0.10.0
+    - pybind11 >=2.11.0
     - pip
     - dlpack
     - pytest
-    - nanobind
   run:
     - python
     - numpy >=1.26.0
-    - ninja
     - pydantic
     - sentencepiece
     - tiktoken
     - pytorch >=1.10.0
     - transformers >=4.38.0
-    - huggingface_hub
-    - protobuf
-    - triton  # You can optionally condition this with Jinja if needed
+    - triton  # [linux]
 
 test:
   imports:
     - xgrammar
   requires:
+    - protobuf
     - pytest
-  commands:
-    - python -m pytest tests/ -m "not hf_token_required"
+    - huggingface_hub
+    - numpy >=1.26.0
+    - pydantic
+    - sentencepiece
+    - tiktoken
+    - pytorch >=1.10.0
+    - transformers >=4.38.0
   source_files:
     - tests/
+  commands:
+    - python -m pytest tests/ -m "not hf_token_required"
 
 about:
-  homepage: https://github.com/mlc-ai/xgrammar
+  home: https://github.com/mlc-ai/xgrammar
   summary: XGrammar is an open-source library for efficient, flexible, and portable structured generation.
   license: Apache-2.0 AND BSD-4-Clause
   license_file:
@@ -71,6 +72,6 @@ extra:
     reason: Dependency for vllm
   recipe-maintainers:
     - ianaobi
+  recipe-maintainers:
     - zbowling
-    - Ubospica
 
