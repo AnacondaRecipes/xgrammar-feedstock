@@ -29,10 +29,12 @@ requirements:
     - pip
     - dlpack
     - pytest
+    - pydantic >=1.10.0,<2.0.0
   run:
     - python
     - numpy >=1.26.0
-    - pydantic
+    #- pydantic
+    - pydantic >=1.10.0,<2.0.0
     - sentencepiece
     - tiktoken
     - pytorch >=1.10.0
