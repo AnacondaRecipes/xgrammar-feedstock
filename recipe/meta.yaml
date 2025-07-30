@@ -1,78 +1,71 @@
+{% set name = "xgrammar" %}
+{% set version = "0.1.16" %}
+
 package:
-  name: xgrammar
-  version: 0.1.16
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  url: https://pypi.org/packages/source/x/xgrammar/xgrammar-0.1.16.tar.gz
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/xgrammar-{{ version }}.tar.gz
   sha256: 4ddd5128a82d0a9c800c03df25c610368ca630704ad20a6bb7a3629f24ced442
 
 build:
+  skip: true  # [py>=400 or py2k]
+  script:
+    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
   number: 0
-  script: |
-    export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
-    if [[ $(uname) == "Linux" ]]; then
-      export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
-    fi
-    $PYTHON -m pip install . -vv --no-deps --no-build-isolation
+  run_exports:
+    - libstdcxx-ng
 
 requirements:
   build:
-    - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - cmake
+    - gxx_linux-64
+    - cmake >=3.18
+    - make
     - ninja
-    - make  # [linux]
+
   host:
     - python
+    - pip
+    - cmake >=3.18
     - scikit-build-core >=0.10.0
     - pybind11 >=2.11.0
-    - pip
-    - dlpack
-    - pytest
-    - pydantic >=1.10.0,<2.0.0
+    - libstdcxx-ng
+    - ninja
   run:
     - python
-    - numpy >=1.26.0
-    #- pydantic
-    - pydantic >=1.10.0,<2.0.0
-    - sentencepiece
-    - tiktoken
-    - pytorch >=1.10.0
-    - transformers >=4.38.0
-    - triton  # [linux]
-
-test:
-  imports:
-    - xgrammar
-  requires:
-    - protobuf
-    - pytest
-    - huggingface_hub
-    - numpy >=1.26.0
     - pydantic
     - sentencepiece
     - tiktoken
     - pytorch >=1.10.0
     - transformers >=4.38.0
-  source_files:
-    - tests/
+    - triton  # [linux]
+    - libstdcxx-ng
+    - ninja
+
+test:
+  imports:
+    - xgrammar
   commands:
-    - python -m pytest tests/ -m "not hf_token_required"
+    - which ninja
+  requires:
+    - pip
+    - ninja
 
 about:
-  home: https://github.com/mlc-ai/xgrammar
-  summary: XGrammar is an open-source library for efficient, flexible, and portable structured generation.
-  license: Apache-2.0 AND BSD-4-Clause
+  summary: Efficient, Flexible and Portable Structured Generation
+  license: MIT AND Apache-2.0 AND BSD-3-Clause
   license_file:
     - LICENSE
     - NOTICE
-
+    - 3rdparty/dlpack/LICENSE
+    - 3rdparty/googletest/LICENSE
+    - 3rdparty/cpptrace/LICENSE
 extra:
   anaconda-services:
     ref: https://anaconda.zendesk.com/agent/tickets/49522
     reason: Dependency for vllm
   recipe-maintainers:
     - ianaobi
-  recipe-maintainers:
-    - zbowling
 
