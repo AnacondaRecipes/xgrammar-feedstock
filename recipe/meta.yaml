@@ -1,0 +1,86 @@
+{% set name = "xgrammar" %}
+{% set version = "0.1.19" %}
+{% set sha256 = "75bf3e814283b1cbaee9252234c5d4081f0058d29b26d8984f1cdf031c99b775" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: {{ sha256 }}
+  patches:
+    - patches/001_remove_ninja_dep.patch
+  #   - patches/0001-remove-mlx-and-ninja.patch
+
+build:
+  skip: true # [py<310]
+  number: 0
+  #script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - {{ stdlib('c') }}
+    - cmake
+    - ninja
+    - make # [unix]
+
+  host:
+    - python
+    - scikit-build-core >=0.10.0
+    - pip
+    #- dlpack
+    - pytest
+    - nanobind
+  run:
+    - python
+    - numpy >=1.26.0
+    #- ninja
+    - pydantic
+    - sentencepiece
+    - tiktoken
+    - pytorch =2.7
+    - transformers >=4.38.0
+    - triton # [linux and x86_64]
+    - mlx-lm # [osx and arm64]
+
+test:
+  source_files:
+    - tests/
+  imports:
+    - xgrammar
+  commands:
+    - pip check
+    - pytest -m "not hf_token_required"
+  requires:
+    - pip
+    #- ninja
+    - protobuf
+    - pytest
+    - huggingface_hub
+    #- numpy >=1.26.0
+    #- pydantic
+    #- sentencepiece
+    #- tiktoken
+    #- pytorch >=1.10.0
+    #- transformers >=4.38.0
+
+about:
+  homepage: https://github.com/mlc-ai/xgrammar
+  summary: XGrammar is an open-source library for efficient, flexible, and portable structured generation.
+  description: |
+    description
+  license: Apache-2.0 AND BSD-4-Clause
+  license_file:
+    - LICENSE
+    - NOTICE
+  dev_url: https://github.com/mlc-ai/xgrammar
+  doc_url: https://github.com/mlc-ai/xgrammar
+
+extra:
+  recipe-maintainers:
+    - zbowling
+    - Ubospica
