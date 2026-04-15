@@ -10,7 +10,6 @@ source:
   sha256: 75bf3e814283b1cbaee9252234c5d4081f0058d29b26d8984f1cdf031c99b775
   patches:
     - patches/001_remove_ninja_dep.patch
-  #   - patches/0001-remove-mlx-and-ninja.patch
 
 build:
   # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
@@ -31,8 +30,9 @@ requirements:
     - python
     - scikit-build-core >=0.10.0
     - pip
-    - pytest
-    - nanobind
+    - nanobind =2.12
+    - numpy {{ numpy }}
+    - pytorch =2.7
   run:
     - python
     - numpy >=1.26.0
@@ -42,7 +42,7 @@ requirements:
     - pytorch =2.7
     - transformers >=4.38.0
     - triton # [linux and x86_64]
-    
+
     # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
     #- mlx-lm # [osx and arm64]
 
@@ -61,7 +61,7 @@ test:
     - huggingface_hub
 
 about:
-  homepage: https://github.com/mlc-ai/xgrammar
+  home: https://github.com/mlc-ai/xgrammar
   summary: XGrammar is an open-source library for efficient, flexible, and portable structured generation.
   description: |
     XGrammar is an open-source library for efficient, flexible, and portable
