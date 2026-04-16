@@ -13,6 +13,7 @@ source:
 
 build:
   # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
+  # 3.14 support from 0.1.30
   skip: true # [py>313 or osx]
   number: 0
 
@@ -31,15 +32,12 @@ requirements:
     - scikit-build-core >=0.10.0
     - pip
     - nanobind =2.12
-    - numpy {{ numpy }}
-    - pytorch =2.7
   run:
     - python
-    - numpy >=1.26.0
     - pydantic
     - sentencepiece
     - tiktoken
-    - pytorch =2.7
+    - pytorch >=1.10.0
     - transformers >=4.38.0
     - triton # [linux and x86_64]
 
@@ -69,7 +67,9 @@ about:
     structural correctness of the output. It supports general context-free
     grammar to enable a broad range of structures, including JSON, regex,
     custom context-free grammar, etc.
-  license: Apache-2.0 AND BSD-4-Clause
+  # xgrammar uses the Apache license, but it vendors picojson, which appears to use a
+  # combination of the Apache 2 and BSD-2-Clause licenses.
+  license: Apache-2.0 AND BSD-2-Clause
   license_file:
     - LICENSE
     - NOTICE
