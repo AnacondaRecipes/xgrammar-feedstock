@@ -1,3 +1,2 @@
 channels:
-  - https://staging.continuum.io/pbp/fs/mlx-feedstock/pr1/f445946
-  - https://staging.continuum.io/pbp/fs/mlx-lm-feedstock/pr1/9168a9f
+  - https://staging.continuum.io/pbp/fs/apache-tvm-ffi-feedstock/pr1/8a4c460

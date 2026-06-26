@@ -3,6 +3,9 @@ export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
 
 if [[ $(uname) == "Linux" ]]; then
     export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
+    # Disable LTO to avoid linker issues with tvm_ffi shared library
+    export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include -fno-lto"
+    export LDFLAGS="$LDFLAGS -fno-lto"
 else
     export CXXFLAGS="$CXXFLAGS -Wno-deprecated-literal-operator"
 fi
