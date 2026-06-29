@@ -16,6 +16,17 @@ build:
   # 3.14 support from 0.1.30
   skip: true # [osx]
   number: 0
+  missing_dso_allowlist:
+    # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
+    # libxgrammar_bindings.so will attempt to load it, so it will already be loaded into
+    # the applications memory space before it is needed. There is no guarantee that this
+    # will always work. A change in behavior in either xgrammar or apache-tvm-ffi could
+    # change this, so the apache-tvm-ffi version must be pinned exactly. This behavior
+    # must be verified for every new version of xgrammar.
+    # See: https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/__init__.py#L1
+    # and https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/load_binding.py
+    # and https://github.com/apache/tvm-ffi/blob/v0.1.9/python/tvm_ffi/__init__.py#L33-L36
+    - '$RPATH/libtvm_ffi.so' # [linux]
 
 
 requirements:
@@ -30,11 +41,13 @@ requirements:
   host:
     - python
     - scikit-build-core >=0.10.0
-    - apache-tvm-ffi >=0.1.9
+    # apache-tvm-ffi must be pinned exactly. See missing_dso_allowlist comment for more details.
+    - apache-tvm-ffi ==0.1.9
     - pip
   run:
     - python
-    - apache-tvm-ffi >=0.1.9
+    # apache-tvm-ffi must be pinned exactly. See missing_dso_allowlist comment for more details.
+    - apache-tvm-ffi ==0.1.9
     - pydantic
     - sentencepiece
     
