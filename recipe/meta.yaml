@@ -16,7 +16,7 @@ build:
   # 3.14 support from 0.1.30
   skip: true # [osx]
   number: 0
-  missing_dso_allowlist:
+  missing_dso_whitelist:
     # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
     # libxgrammar_bindings.so will attempt to load it, so it will already be loaded into
     # the applications memory space before it is needed. There is no guarantee that this
