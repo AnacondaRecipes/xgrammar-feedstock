@@ -8,13 +8,11 @@ package:
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
   sha256: 42bcc5c4187ff9cb6edc44ff5f56030d8b69d62c7576f674a5a074f71b68b1fa
-  #patches:
-  #  - patches/001_remove_ninja_dep.patch
 
 build:
   # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
   # 3.14 support from 0.1.30
-  skip: true # [osx]
+  #skip: true # [osx]
   number: 0
   missing_dso_whitelist:
     # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
@@ -28,6 +26,7 @@ build:
     # and https://github.com/apache/tvm-ffi/blob/v0.1.9/python/tvm_ffi/__init__.py#L33-L36
     - "**/libtvm_ffi.so"      # [linux]
     - "**/tvm_ffi.dll"        # [win]
+    - "**/libtvm_ffi.dylib"   # [osx]
 
 
 requirements:
@@ -36,22 +35,19 @@ requirements:
     - {{ compiler('cxx') }}
     - {{ stdlib('c') }}
     - cmake
-    - ninja
-    - make # [unix]
+    - ninja-base
 
   host:
     - python
     - scikit-build-core >=0.10.0
-    # apache-tvm-ffi must be pinned exactly. See missing_dso_allowlist comment for more details.
+    # apache-tvm-ffi must be pinned exactly. See missing_dso_whitelist comment for more details.
     - apache-tvm-ffi ==0.1.9
     - pip
   run:
     - python
-    # apache-tvm-ffi must be pinned exactly. See missing_dso_allowlist comment for more details.
+    # apache-tvm-ffi must be pinned exactly. See missing_dso_whitelist comment for more details.
     - apache-tvm-ffi ==0.1.9
     - pydantic
-    - sentencepiece
-    
     - pytorch >=1.10.0
     - transformers >=4.38.0
     - triton # [linux and x86_64]
@@ -59,7 +55,7 @@ requirements:
     - typing-extensions >=4.9.0
 
     # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
-    #- mlx-lm # [osx and arm64]
+    - mlx-lm # [osx and arm64]
 
 test:
   source_files:
