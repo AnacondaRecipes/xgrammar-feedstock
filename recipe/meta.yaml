@@ -1,5 +1,5 @@
 {% set name = "xgrammar" %}
-{% set version = "0.1.19" %}
+{% set version = "0.2.2" %}
 
 package:
   name: {{ name|lower }}
@@ -7,15 +7,26 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 75bf3e814283b1cbaee9252234c5d4081f0058d29b26d8984f1cdf031c99b775
-  patches:
-    - patches/001_remove_ninja_dep.patch
+  sha256: 42bcc5c4187ff9cb6edc44ff5f56030d8b69d62c7576f674a5a074f71b68b1fa
 
 build:
-  # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
+  # Skipping osx builds for now due to troubles building mlx-lm and mlx packages
   # 3.14 support from 0.1.30
-  skip: true # [py>313 or osx]
+  skip: true # [osx]
   number: 0
+  missing_dso_whitelist:
+    # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
+    # libxgrammar_bindings.so will attempt to load it, so it will already be loaded into
+    # the applications memory space before it is needed. There is no guarantee that this
+    # will always work. A change in behavior in either xgrammar or apache-tvm-ffi could
+    # change this, so the apache-tvm-ffi version must be pinned exactly. This behavior
+    # must be verified for every new version of xgrammar.
+    # See: https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/__init__.py#L1
+    # and https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/load_binding.py
+    # and https://github.com/apache/tvm-ffi/blob/v0.1.9/python/tvm_ffi/__init__.py#L33-L36
+    - "**/libtvm_ffi.so"      # [linux]
+    - "**/tvm_ffi.dll"        # [win]
+    #- "**/libtvm_ffi.dylib"   # [osx]
 
 
 requirements:
@@ -24,24 +35,25 @@ requirements:
     - {{ compiler('cxx') }}
     - {{ stdlib('c') }}
     - cmake
-    - ninja
-    - make # [unix]
+    - ninja-base
 
   host:
     - python
     - scikit-build-core >=0.10.0
+    # apache-tvm-ffi must be pinned exactly. See missing_dso_whitelist comment for more details.
+    - apache-tvm-ffi ==0.1.9
     - pip
-    - nanobind =2.12
   run:
     - python
+    # apache-tvm-ffi must be pinned exactly. See missing_dso_whitelist comment for more details.
+    - apache-tvm-ffi ==0.1.9
     - pydantic
-    - sentencepiece
-    - tiktoken
     - pytorch >=1.10.0
     - transformers >=4.38.0
     - triton # [linux and x86_64]
-
-    # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
+    - numpy
+    - typing-extensions >=4.9.0
+    
     #- mlx-lm # [osx and arm64]
 
 test:
@@ -57,6 +69,13 @@ test:
     - protobuf
     - pytest
     - huggingface_hub
+    - sentencepiece
+    - tiktoken
+
+    # This requirement is currently preventing us from building workable macosx versions.
+    # We have mlx-lm available on the main channel, but it requires transformers >=5.0.0, directly
+    # conflicting with this requirement.
+    #- transformers<4.50.0 # [osx]
 
 about:
   home: https://github.com/mlc-ai/xgrammar
