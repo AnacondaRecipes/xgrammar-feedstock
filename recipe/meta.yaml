@@ -12,7 +12,7 @@ source:
 build:
   # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
   # 3.14 support from 0.1.30
-  #skip: true # [osx]
+  skip: true # [osx]
   number: 0
   missing_dso_whitelist:
     # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
@@ -53,9 +53,8 @@ requirements:
     - triton # [linux and x86_64]
     - numpy
     - typing-extensions >=4.9.0
-
-    # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
-    - mlx-lm # [osx and arm64]
+    
+    #- mlx-lm # [osx and arm64]
 
 test:
   source_files:
@@ -72,7 +71,11 @@ test:
     - huggingface_hub
     - sentencepiece
     - tiktoken
-    - transformers<4.50.0 # [osx]
+
+    # This requirement is currently preventing us from building workable macosx versions.
+    # We have mlx-lm available on the main channel, but it requires transformers >=5.0.0, directly
+    # conflicting with this requirement.
+    #- transformers<4.50.0 # [osx]
 
 about:
   home: https://github.com/mlc-ai/xgrammar
