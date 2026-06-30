@@ -26,8 +26,8 @@ build:
     # See: https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/__init__.py#L1
     # and https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/load_binding.py
     # and https://github.com/apache/tvm-ffi/blob/v0.1.9/python/tvm_ffi/__init__.py#L33-L36
-    - '**/libtvm_ffi.so' # [linux]
-    - '**/libtvm_ffi.dll' # [win]
+    - "**/libtvm_ffi.so"      # [linux]
+    - "**/tvm_ffi.dll"        # [win]
 
 
 requirements:
