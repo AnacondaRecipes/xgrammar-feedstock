@@ -10,9 +10,6 @@ source:
   sha256: 42bcc5c4187ff9cb6edc44ff5f56030d8b69d62c7576f674a5a074f71b68b1fa
 
 build:
-  # Skipping osx builds for now due to troubles building mlx-lm and mlx packages
-  # 3.14 support from 0.1.30
-  skip: true # [osx]
   number: 0
   missing_dso_whitelist:
     # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
@@ -24,9 +21,9 @@ build:
     # See: https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/__init__.py#L1
     # and https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/load_binding.py
     # and https://github.com/apache/tvm-ffi/blob/v0.1.9/python/tvm_ffi/__init__.py#L33-L36
-    - "**/libtvm_ffi.so"      # [linux]
-    - "**/tvm_ffi.dll"        # [win]
-    #- "**/libtvm_ffi.dylib"   # [osx]
+    - "$RPATH/libtvm_ffi.so"      # [linux]
+    - "$RPATH/tvm_ffi.dll"        # [win]
+    - "$RPATH/libtvm_ffi.dylib"      # [osx]
 
 
 requirements:
@@ -36,6 +33,8 @@ requirements:
     - {{ stdlib('c') }}
     - cmake
     - ninja-base
+    # binutils needed for "strip" command
+    - binutils #[linux]
 
   host:
     - python
@@ -53,8 +52,6 @@ requirements:
     - triton # [linux and x86_64]
     - numpy
     - typing-extensions >=4.9.0
-    
-    #- mlx-lm # [osx and arm64]
 
 test:
   source_files:
@@ -71,11 +68,6 @@ test:
     - huggingface_hub
     - sentencepiece
     - tiktoken
-
-    # This requirement is currently preventing us from building workable macosx versions.
-    # We have mlx-lm available on the main channel, but it requires transformers >=5.0.0, directly
-    # conflicting with this requirement.
-    #- transformers<4.50.0 # [osx]
 
 about:
   home: https://github.com/mlc-ai/xgrammar
