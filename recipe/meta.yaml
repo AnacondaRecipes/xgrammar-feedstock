@@ -14,10 +14,11 @@ build:
   missing_dso_whitelist:
     # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
     # libxgrammar_bindings.so will attempt to load it, so it will already be loaded into
-    # the applications memory space before it is needed. There is no guarantee that this
-    # will always work. A change in behavior in either xgrammar or apache-tvm-ffi could
-    # change this, so the apache-tvm-ffi version must be pinned exactly. This behavior
-    # must be verified for every new version of xgrammar.
+    # the applications memory space before it is needed. There is no mechanism that guarentees
+    # this behavior, however this is the stated intent of the tvm_ffi project. While a 
+    # change that breaks this behavior is unlikely, it would cause a problem. Trying to
+    # balance the stated intent of the library vs the lack of machinery to enforce it,
+    # it is probably sufficient to use pin_compatible on the apache-tvm-ffi library.
     # See: https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/__init__.py#L1
     # and https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/load_binding.py
     # and https://github.com/apache/tvm-ffi/blob/v0.1.9/python/tvm_ffi/__init__.py#L33-L36
@@ -39,13 +40,14 @@ requirements:
   host:
     - python
     - scikit-build-core >=0.10.0
-    # apache-tvm-ffi must be pinned exactly. See missing_dso_whitelist comment for more details.
     - apache-tvm-ffi ==0.1.9
     - pip
   run:
     - python
-    # apache-tvm-ffi must be pinned exactly. See missing_dso_whitelist comment for more details.
-    - apache-tvm-ffi ==0.1.9
+    # Pinning apache-tvm-ffi exactly guarantees that libtvm_ffi.so will be loaded prior to
+    # xgrammar libraries, but is probably a bit too strict. Relax the run constraint a bit
+    # with pin_compatible. See comment in missing_dso_whitelist.
+    - {{ pin_compatible("apache-tvm-ffi", max_pin="x.x") }}
     - pydantic
     - pytorch >=1.10.0
     - transformers >=4.38.0
