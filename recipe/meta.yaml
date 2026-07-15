@@ -1,5 +1,5 @@
 {% set name = "xgrammar" %}
-{% set version = "0.1.19" %}
+{% set version = "0.2.2" %}
 
 package:
   name: {{ name|lower }}
@@ -7,15 +7,24 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 75bf3e814283b1cbaee9252234c5d4081f0058d29b26d8984f1cdf031c99b775
-  patches:
-    - patches/001_remove_ninja_dep.patch
+  sha256: 42bcc5c4187ff9cb6edc44ff5f56030d8b69d62c7576f674a5a074f71b68b1fa
 
 build:
-  # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
-  # 3.14 support from 0.1.30
-  skip: true # [py>313 or osx]
   number: 0
+  missing_dso_whitelist:
+    # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
+    # libxgrammar_bindings.so will attempt to load it, so it will already be loaded into
+    # the applications memory space before it is needed. There is no mechanism that guarentees
+    # this behavior, however this is the stated intent of the tvm_ffi project. While a 
+    # change that breaks this behavior is unlikely, it would cause a problem. Trying to
+    # balance the stated intent of the library vs the lack of machinery to enforce it,
+    # it is probably sufficient to use pin_compatible on the apache-tvm-ffi library.
+    # See: https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/__init__.py#L1
+    # and https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/load_binding.py
+    # and https://github.com/apache/tvm-ffi/blob/v0.1.9/python/tvm_ffi/__init__.py#L33-L36
+    - "$RPATH/libtvm_ffi.so"      # [linux]
+    - "$RPATH/tvm_ffi.dll"        # [win]
+    - "$RPATH/libtvm_ffi.dylib"      # [osx]
 
 
 requirements:
@@ -24,25 +33,27 @@ requirements:
     - {{ compiler('cxx') }}
     - {{ stdlib('c') }}
     - cmake
-    - ninja
-    - make # [unix]
+    - ninja-base
+    # binutils needed for "strip" command
+    - binutils #[linux]
 
   host:
     - python
     - scikit-build-core >=0.10.0
+    - apache-tvm-ffi ==0.1.9
     - pip
-    - nanobind =2.12
   run:
     - python
+    # Pinning apache-tvm-ffi exactly guarantees that libtvm_ffi.so will be loaded prior to
+    # xgrammar libraries, but is probably a bit too strict. Relax the run constraint a bit
+    # with pin_compatible. See comment in missing_dso_whitelist.
+    - {{ pin_compatible("apache-tvm-ffi", max_pin="x.x") }}
     - pydantic
-    - sentencepiece
-    - tiktoken
     - pytorch >=1.10.0
     - transformers >=4.38.0
     - triton # [linux and x86_64]
-
-    # Skipping osx builds for now due to troubls building mlx-lm and mlx packages
-    #- mlx-lm # [osx and arm64]
+    - numpy
+    - typing-extensions >=4.9.0
 
 test:
   source_files:
@@ -57,6 +68,8 @@ test:
     - protobuf
     - pytest
     - huggingface_hub
+    - sentencepiece
+    - tiktoken
 
 about:
   home: https://github.com/mlc-ai/xgrammar
