@@ -1,13 +1,13 @@
 {% set name = "xgrammar" %}
-{% set version = "0.2.2" %}
+{% set version = "0.2.3" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 42bcc5c4187ff9cb6edc44ff5f56030d8b69d62c7576f674a5a074f71b68b1fa
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
+  sha256: f76423630ae3ac4e090cb38ce1e30e7bcc69b3dee4d22d94353944386a4c6f18
 
 build:
   number: 0
@@ -15,17 +15,17 @@ build:
     # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
     # libxgrammar_bindings.so will attempt to load it, so it will already be loaded into
     # the applications memory space before it is needed. There is no mechanism that guarentees
-    # this behavior, however this is the stated intent of the tvm_ffi project. While a 
+    # this behavior, however this is the stated intent of the tvm_ffi project. While a
     # change that breaks this behavior is unlikely, it would cause a problem. Trying to
     # balance the stated intent of the library vs the lack of machinery to enforce it,
     # it is probably sufficient to use pin_compatible on the apache-tvm-ffi library.
     # See: https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/__init__.py#L1
     # and https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/load_binding.py
     # and https://github.com/apache/tvm-ffi/blob/v0.1.9/python/tvm_ffi/__init__.py#L33-L36
-    - "$RPATH/libtvm_ffi.so"      # [linux]
-    - "$RPATH/tvm_ffi.dll"        # [win]
-    - "$RPATH/libtvm_ffi.dylib"      # [osx]
-
+    - $RPATH/libtvm_ffi.so  # [linux]
+    - $RPATH/tvm_ffi.dll  # [win]
+    - $RPATH/libtvm_ffi.dylib  # [osx]
+  skip: true  # [py<38]
 
 requirements:
   build:
@@ -35,13 +35,13 @@ requirements:
     - cmake
     - ninja-base
     # binutils needed for "strip" command
-    - binutils #[linux]
-
+    - binutils  #[linux]
   host:
     - python
     - scikit-build-core >=0.10.0
-    - apache-tvm-ffi ==0.1.9
+    - apache-tvm-ffi >=0.1.9
     - pip
+    - pytorch {{ pytorch }}
   run:
     - python
     # Pinning apache-tvm-ffi exactly guarantees that libtvm_ffi.so will be loaded prior to
@@ -51,9 +51,11 @@ requirements:
     - pydantic
     - pytorch >=1.10.0
     - transformers >=4.38.0
-    - triton # [linux and x86_64]
+    - triton  # [linux and x86_64]
     - numpy
     - typing-extensions >=4.9.0
+    - apache-tvm-ffi >=0.1.9
+    - typing_extensions >=4.9.0
 
 test:
   source_files:
