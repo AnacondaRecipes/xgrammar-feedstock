@@ -42,9 +42,6 @@ requirements:
     - apache-tvm-ffi >=0.1.9
     - pip
     - pytorch {{ pytorch }}
-    # Force openblas as the BLAS provider — pytorch's builds require blas=openblas,
-    # and leaving this unpinned lets the solver pick an incompatible provider (e.g. netlib/mkl).
-    # - blas=*=openblas
   run:
     - python
     # Pinning apache-tvm-ffi exactly guarantees that libtvm_ffi.so will be loaded prior to
@@ -53,7 +50,6 @@ requirements:
     - {{ pin_compatible("apache-tvm-ffi", max_pin="x.x") }}
     - pydantic
     - pytorch >=1.10.0
-    # - blas=*=openblas
     - transformers >=4.38.0
     - triton  # [linux and x86_64]
     - numpy
