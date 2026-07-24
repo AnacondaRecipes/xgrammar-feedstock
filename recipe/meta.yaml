@@ -2,7 +2,7 @@
 {% set version = "0.2.3" %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
@@ -29,9 +29,9 @@ build:
 
 requirements:
   build:
+    - {{ stdlib('c') }}
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
-    - {{ stdlib('c') }}
     - cmake
     - ninja-base
     # binutils needed for "strip" command
@@ -55,11 +55,10 @@ requirements:
     - numpy
     - typing-extensions >=4.9.0
     - apache-tvm-ffi >=0.1.9
-    - typing_extensions >=4.9.0
 
 test:
   source_files:
-    - tests/
+    - tests
   imports:
     - xgrammar
   commands:
@@ -72,6 +71,7 @@ test:
     - huggingface_hub
     - sentencepiece
     - tiktoken
+    - transformers <4.50.0  # [osx]
 
 about:
   home: https://github.com/mlc-ai/xgrammar
