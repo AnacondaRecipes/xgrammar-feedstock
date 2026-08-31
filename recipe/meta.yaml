@@ -1,5 +1,6 @@
 {% set name = "xgrammar" %}
 {% set version = "0.2.3" %}
+{% set apache_tvm_ffi = "0.1.10" %}
 
 package:
   name: {{ name }}
@@ -10,7 +11,7 @@ source:
   sha256: f76423630ae3ac4e090cb38ce1e30e7bcc69b3dee4d22d94353944386a4c6f18
 
 build:
-  number: 0
+  number: 1
   missing_dso_whitelist:
     # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
     # libxgrammar_bindings.so will attempt to load it, so it will already be loaded into
@@ -39,22 +40,20 @@ requirements:
   host:
     - python
     - scikit-build-core >=0.10.0
-    - apache-tvm-ffi >=0.1.9
+    - apache-tvm-ffi =={{ apache_tvm_ffi }}
     - pip
     - pytorch {{ pytorch }}
   run:
     - python
-    # Pinning apache-tvm-ffi exactly guarantees that libtvm_ffi.so will be loaded prior to
-    # xgrammar libraries, but is probably a bit too strict. Relax the run constraint a bit
-    # with pin_compatible. See comment in missing_dso_whitelist.
-    - {{ pin_compatible("apache-tvm-ffi", max_pin="x.x") }}
+    # Pinning apache-tvm-ffi exactly is necessary because there could be breaking changes
+    # on any version. It does not strictly follow semver (e.g. 0.1.9->0.1.10)
+    - apache-tvm-ffi =={{ apache_tvm_ffi }}
     - pydantic
     - pytorch >=1.10.0
     - transformers >=4.38.0
     - triton  # [linux and x86_64]
     - numpy
     - typing-extensions >=4.9.0
-    - apache-tvm-ffi >=0.1.9
 
 {% set win_deselected_tests = "" %}
 {% set win_deselected_tests = win_deselected_tests + " and not test_get_masked_tokens_from_bitmask" %}  # [win]
