@@ -1,6 +1,6 @@
 {% set name = "xgrammar" %}
-{% set version = "0.2.3" %}
-{% set apache_tvm_ffi = "0.1.10" %}
+{% set version = "0.2.8" %}
+{% set apache_tvm_ffi = "0.1.11" %}
 
 package:
   name: {{ name }}
@@ -8,7 +8,7 @@ package:
 
 source:
   url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: f76423630ae3ac4e090cb38ce1e30e7bcc69b3dee4d22d94353944386a4c6f18
+  sha256: 8305646fd2b319d6c3003f51a1665e54cbbe9cba1fb636bc41d0b46434ccbb80
 
 build:
   number: 1
@@ -40,6 +40,7 @@ requirements:
   host:
     - python
     - scikit-build-core >=0.10.0
+    - setuptools-scm >=8.1
     - apache-tvm-ffi =={{ apache_tvm_ffi }}
     - pip
     - pytorch {{ pytorch }}
