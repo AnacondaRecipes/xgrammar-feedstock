@@ -11,8 +11,6 @@ else
 fi
 $PYTHON -m pip install . -vv --no-deps --no-build-isolation
 
-#rm $SP_DIR/xgrammar/lib/libxgrammar.a
-
 if [ -f $SP_DIR/xgrammar/libxgrammar_bindings.so ]; then
     strip -S $SP_DIR/xgrammar/libxgrammar_bindings.so
 fi
