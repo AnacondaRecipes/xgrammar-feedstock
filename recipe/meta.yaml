@@ -11,7 +11,7 @@ source:
   sha256: 8305646fd2b319d6c3003f51a1665e54cbbe9cba1fb636bc41d0b46434ccbb80
 
 build:
-  number: 1
+  number: 0
   missing_dso_whitelist:
     # libtvm_ffi.so will get loaded by xgrammar code (and apache-tvm-ffi code) before
     # libxgrammar_bindings.so will attempt to load it, so it will already be loaded into
@@ -20,9 +20,9 @@ build:
     # change that breaks this behavior is unlikely, it would cause a problem. Trying to
     # balance the stated intent of the library vs the lack of machinery to enforce it,
     # it is probably sufficient to use pin_compatible on the apache-tvm-ffi library.
-    # See: https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/__init__.py#L1
-    # and https://github.com/mlc-ai/xgrammar/blob/v0.2.2/python/xgrammar/load_binding.py
-    # and https://github.com/apache/tvm-ffi/blob/v0.1.9/python/tvm_ffi/__init__.py#L33-L36
+    # See: https://github.com/mlc-ai/xgrammar/blob/v0.2.8/python/xgrammar/__init__.py#L1
+    # and https://github.com/mlc-ai/xgrammar/blob/v0.2.8/python/xgrammar/load_binding.py
+    # and https://github.com/apache/tvm-ffi/blob/v0.1.11/python/tvm_ffi/__init__.py#L54-L57
     - $RPATH/libtvm_ffi.so  # [linux]
     - $RPATH/tvm_ffi.dll  # [win]
     - $RPATH/libtvm_ffi.dylib  # [osx]
@@ -56,9 +56,9 @@ requirements:
     - numpy
     - typing-extensions >=4.9.0
 
-{% set win_deselected_tests = "" %}
-{% set win_deselected_tests = win_deselected_tests + " and not test_get_masked_tokens_from_bitmask" %}  # [win]
-{% set win_deselected_tests = win_deselected_tests + " and not test_apply_token_bitmask_inplace_kernel_large" %}  # [win]
+{% set deselected_tests = "MELODY" %}
+{% set deselected_tests = deselected_tests + " or test_get_masked_tokens_from_bitmask" %}  # [win]
+{% set deselected_tests = deselected_tests + " or test_apply_token_bitmask_inplace_kernel_large" %}  # [win]
 
 test:
   source_files:
@@ -67,7 +67,7 @@ test:
     - xgrammar
   commands:
     - pip check
-    - pytest -m "not hf_token_required" -k "True{{ win_deselected_tests }}"
+    - pytest -m "not hf_token_required" -k "not ({{ deselected_tests }})"
   requires:
     - pip
     - protobuf
@@ -91,7 +91,7 @@ about:
   license_file:
     - LICENSE
     - NOTICE
-  license_family: Apache
+  license_family: Other
   dev_url: https://github.com/mlc-ai/xgrammar
   doc_url: https://github.com/mlc-ai/xgrammar
 
